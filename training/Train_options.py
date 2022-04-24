@@ -42,7 +42,7 @@ class Options():
 
         #### - Data
         self._parser.add_argument('--tight', default=16, help='Tight')
-        self._parser.add_argument('--path', default=['/mnt/hgfs/resources/gannotation/300VW_Dataset_2015_12_14/'], nargs='+', help='Path to the data')
+        self._parser.add_argument('--path', default=['/mnt/hgfs/resources/gannotation/subdata/'], nargs='+', help='Path to the data')
         self._parser.add_argument('--db', default=['Skeleton'], nargs='+', help='Path to the data')
         self._parser.add_argument('--use_edge', action='store_true', help='Use edge-maps')
 
