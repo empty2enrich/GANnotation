@@ -23,7 +23,7 @@ class Options():
         self._parser.add_argument('--lr_dis', default=0.0001, type=float, help='learning rate dis')
         self._parser.add_argument('--lr_gen', default=0.0001, type=float, help='learning rate gen')
         self._parser.add_argument('--gantype', default='wgan-gp', type=str, help='GAN type')
-        self._parser.add_argument('--num_workers', default=12, type=int, help='Number of workers')
+        self._parser.add_argument('--num_workers', default=4, type=int, help='Number of workers')
         
         #### - Optimizer
         self._parser.add_argument('--optim',default='Adam',help='Optimizer')
