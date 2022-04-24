@@ -1,13 +1,17 @@
 import glob, os, sys, csv, math, functools, collections, numpy as np, torch, torch.nn as nn
 import torch.nn.functional as F
+import torch
 from torchvision.models.vgg import vgg16
 from utils import LossNetwork, init_weights
 from model_GAN import Generator, Discriminator
 import itertools
 from torch.autograd import Variable
 
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 def _gradient_penalty_D(D, real_img, fake_img, maps=None):
-    alpha = torch.rand(real_img.size(0),1,1,1).cuda().expand_as(real_img)
+    alpha = torch.rand(real_img.size(0),1,1,1).to(device).expand_as(real_img)
     interpolated = alpha * real_img + (1 - alpha) * fake_img
     interpolated.required_grad = True
     if maps is not None:
@@ -17,7 +21,7 @@ def _gradient_penalty_D(D, real_img, fake_img, maps=None):
 
     grad = torch.autograd.grad(outputs=interpolated_prob,
                                inputs=interpolated,
-                               grad_outputs=torch.ones(interpolated_prob.size()).cuda(),
+                               grad_outputs=torch.ones(interpolated_prob.size()).to(device),
                                retain_graph=True,
                                create_graph=True,
                                only_inputs=True)[0]
@@ -60,19 +64,19 @@ class GANnotation():
             self.GEN = torch.nn.DataParallel(self.GEN)
             self.DIS = torch.nn.DataParallel(self.DIS)
             
-        self.DIS.to('cuda').train()
-        self.GEN.to('cuda').train()
+        self.DIS.to(device).train()
+        self.GEN.to(device).train()
 
         if self.l['percep'] > 0:
             # - VGG for perceptual loss
             self.loss_network = LossNetwork(torch.nn.DataParallel(vgg16(pretrained=True))) if torch.cuda.device_count() > 1 else LossNetwork(vgg16(pretrained=True))
             self.loss_network.eval()
-            self.loss_network.to('cuda')
+            self.loss_network.to(device)
             
         self.TripleLoss = (lambda x,y : torch.mean(torch.abs(x-y))) if self.l['triple'] > 0 else None
-        self.SelfLoss = torch.nn.L1Loss().to('cuda') if self.l['self'] > 0 else None
-        self.RecLoss = torch.nn.L1Loss().to('cuda') if self.l['rec'] > 0 else None
-        self.PercepLoss = torch.nn.MSELoss().to('cuda') if self.l['percep'] > 0 else None
+        self.SelfLoss = torch.nn.L1Loss().to(device) if self.l['self'] > 0 else None
+        self.RecLoss = torch.nn.L1Loss().to(device) if self.l['rec'] > 0 else None
+        self.PercepLoss = torch.nn.MSELoss().to(device) if self.l['percep'] > 0 else None
         self.TVLoss = TVLoss if self.l['tv'] > 0 else None
         self.gantype = gantype
         self.loss = dict(G=dict.fromkeys(['adv','self','triple','percep','rec','tv','all']), D=dict.fromkeys(['real','fake','gp','all']))

@@ -18,7 +18,7 @@ class Options():
         self._parser.add_argument('--folder', default='.', help='Folder to save intermediate models')
 
         #### - Training details (bSize, gradient clippng, learning rate, gan type)
-        self._parser.add_argument('--bSize', default=64, type=int,help='Batch Size')
+        self._parser.add_argument('--bSize', default=4, type=int,help='Batch Size')
         self._parser.add_argument('--gc', default=1, help='Use gradient clipping')
         self._parser.add_argument('--lr_dis', default=0.0001, type=float, help='learning rate dis')
         self._parser.add_argument('--lr_gen', default=0.0001, type=float, help='learning rate gen')

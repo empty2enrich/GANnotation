@@ -1,5 +1,6 @@
 from __future__ import print_function, division
 import glob, os, sys, pickle, torch, cv2, time, numpy as np
+
 from torch.utils.data import Dataset, DataLoader, ConcatDataset
 from torchvision.utils import save_image
 from shutil import copy2
@@ -8,6 +9,9 @@ from GANnotation import GANnotation as model
 from databases import SuperDB
 from utils import AverageMeter
 from Train_options import Options
+
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def main():
     # parse args
@@ -114,7 +118,7 @@ def train_epoch(dataloader, model, myoptimizers, epoch, bSize):
     end = time.time()
     disiters = 5 if args.gantype == 'wgan-gp' else 2
     for i, data in enumerate(dataloader):
-        data = {k: v.to('cuda') for k,v in data.items()}
+        data = {k: v.to(device) for k,v in data.items()}
         if i > 10000:
             break
         
