@@ -50,18 +50,48 @@ class SuperDB(Dataset):
 def preparedb(self, db):
 
     if db == 'Skeleton': # this is an example of what to prepare in a db
+        # def init(self):
+        #     # - here there's the stuff needed to collect points and images and labels or whatever
+        #     # - they are then set to db as 
+        #     keys = ['frames','images']
+        #     for k in keys:
+        #         setattr(self, k, eval(k)) # if the variables are named after the keys
+        #     setattr(self,'len', lenval )  # set value of len
+        # def collect(idx):
+        #     # - function to collect a sample to be processed in getitem
+        #     return [image], [points]
+        # init(self) # - do the initialisation
+        # setattr(self,'collect', collect) # - add collect function to the class
         def init(self):
-            # - here there's the stuff needed to collect points and images and labels or whatever
-            # - they are then set to db as 
-            keys = ['frames','images']
-            for k in keys:
-                setattr(self, k, eval(k)) # if the variables are named after the keys
-            setattr(self,'len', lenval )  # set value of len
+            catC = ['410', '411', '516', '517', '526', '528', '529', '530', '531', '533', '557', '558', '559', '562']
+            mylist = next(os.walk(self.path))[1]
+            data = dict.fromkeys(sorted(set(mylist) - set(catC)))
+            for i,name in enumerate(data.keys()):
+                pathtocheck = self.path + name + '/frames/'
+                files = list(map(lambda x: x.split('/')[-1], sorted(glob.glob(f'{pathtocheck}/*.jpg'))))
+
+                pathtocheck = self.path + name + '/annot/'
+                pts = []
+                for file in sorted(glob.glob(f'{pathtocheck}/*.pts')):
+                    pts.append(torch.load(file))
+                # pts = torch.load(pathtocheck)
+                data[name] = dict(zip(files,pts))
+            setattr(self, 'data', data)
+            setattr(self, 'map', [(x,y) for x in data.keys() for y in data[x].keys()])
+            setattr(self, 'len', len(self.map))
+            setattr(self, 'getim', lambda vid, frame: cv2.cvtColor(cv2.imread(os.path.join(self.path, vid, 'frames', frame)), cv2.COLOR_BGR2RGB))
         def collect(idx):
-            # - function to collect a sample to be processed in getitem
-            return [image], [points]
-        init(self) # - do the initialisation
-        setattr(self,'collect', collect) # - add collect function to the class
+            vid, frame = self.map[idx]
+            frames = list(self.data[vid].keys())
+            subframes = frames[max(0, frames.index(frame)-200):min(len(frames)-1, frames.index(frame)+200)]
+            subframes = [s for s in subframes if np.abs(int(s.split('.')[0]) - int(frame.split('.')[0])) > 50]
+            target = random.sample(subframes, 1)[0]
+            third = random.sample(subframes,1)[0]
+            image = [self.getim(vid,frame), self.getim(vid,target), self.getim(vid,third)]
+            points = [self.data[vid][frame].numpy(), self.data[vid][target].numpy(), self.data[vid][third].numpy()]
+            return image, points
+        init(self)
+        setattr(self,'collect', collect)
  
     if db == '300VW':
         def init(self):
