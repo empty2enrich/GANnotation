@@ -47,14 +47,14 @@ class SuperDB(Dataset):
         for j in range(self.nimages):
             out = process_image(image=image[j%nimg],points=points[j%nimg],angle=(j+1)*self.angle, flip=flip, size=self.size, tight=self.tight)
             if j == 0:
-                sample['B_Im'] = self.transform(out['image'])
-                sample['B_Hm'] = 2*(torch.from_numpy(self.heatmap(out['points']/self.ratio))-0.5)
+                sample['B_Im'] = self.transform(out[0])
+                sample['B_Hm'] = 2*(torch.from_numpy(self.heatmap(out[2]/self.ratio))-0.5)
             if j == 1:
-                sample['A_Im'] = self.transform(out['image'])
-                sample['A_Hm'] = 2*(torch.from_numpy(self.heatmap(out['points']/self.ratio))-0.5)
+                sample['A_Im'] = self.transform(out[0])
+                sample['A_Hm'] = 2*(torch.from_numpy(self.heatmap(out[2]/self.ratio))-0.5)
             if j == 2:
-                sample['C_Im'] = self.transform(out['image'])
-                sample['C_Hm'] = 2*(torch.from_numpy(self.heatmap(out['points']/self.ratio))-0.5)
+                sample['C_Im'] = self.transform(out[0])
+                sample['C_Hm'] = 2*(torch.from_numpy(self.heatmap(out[2]/self.ratio))-0.5)
         return sample
 
 
