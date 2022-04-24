@@ -129,8 +129,10 @@ def crop( image, landmarks , size, tight=8):
 def affine_trans(image,landmarks,angle=None,size=None):
     if angle is None:
         angle = 30*torch.randn(1)
-       
-    print(f'angle: {angle}') 
+
+    if isinstance(angle, list):
+        angle = angle[0]
+    # print(f'angle: {angle}') 
     (h, w) = image.shape[:2]
     (cX, cY) = (w // 2, h // 2)
  
