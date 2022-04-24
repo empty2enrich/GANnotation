@@ -100,7 +100,7 @@ def preparedb(self, db):
             target = random.sample(subframes, 1)[0]
             third = random.sample(subframes,1)[0]
             image = [self.getim(vid,frame), self.getim(vid,target), self.getim(vid,third)]
-            points = [self.data[vid][frame].numpy(), self.data[vid][target].numpy(), self.data[vid][third].numpy()]
+            points = [self.data[vid][frame], self.data[vid][target], self.data[vid][third]]
             return image, points
         init(self)
         setattr(self,'collect', collect)
