@@ -1,5 +1,6 @@
 import argparse
 import os
+import torch
 
 class Options():
 
@@ -41,14 +42,14 @@ class Options():
 
         #### - Data
         self._parser.add_argument('--tight', default=16, help='Tight')
-        self._parser.add_argument('--path', nargs='+', help='Path to the data')
-        self._parser.add_argument('--db', nargs='+', help='Path to the data')
+        self._parser.add_argument('--path', default='', nargs='+', help='Path to the data')
+        self._parser.add_argument('--db', default='/mnt/hgfs/resources/gannotation/300VW_Dataset_2015_12_14', nargs='+', help='Path to the data')
         self._parser.add_argument('--use_edge', action='store_true', help='Use edge-maps')
 
         #### - Miscellanea
         self._parser.add_argument('--visdom', action='store_true', help='Use visdom')
         self._parser.add_argument('--port', default=9001, help='visdom port')
-        self._parser.add_argument('--cuda', default='auto', type=str, help='cuda')
+        self._parser.add_argument('--cuda', default='cuda' if torch.cuda.is_available() else 'cpu' , type=str, help='cuda')
 
 
     def parse_args(self):
