@@ -2,7 +2,19 @@ import inspect, torch, pickle, cv2, os, numpy as np, scipy.io as sio, random, gl
 from torch.utils.data import Dataset
 from utils import process_image, NumpyHeatmap, EdgeMap
 import torchvision.transforms as tr
+import numpy as np
 
+def read_pts(p):
+    res = []
+    with open(p, 'r', encoding='utf-8') as f:
+        data = f.read().split('\n')[3:]
+        for line in data:
+            if '}' in line:
+                break
+            res.append([float(v) for v in line.split(' ')])
+    return np.asarray(res)
+        
+        
 class SuperDB(Dataset):
 
     def __init__(self, path=None, size=128, hm_size=128, flip=False, angle=0, tight=16, nimages=3, db='300VW', transform=None, edge=False):
@@ -73,7 +85,7 @@ def preparedb(self, db):
                 pathtocheck = self.path + name + '/annot/'
                 pts = []
                 for file in sorted(glob.glob(f'{pathtocheck}/*.pts')):
-                    pts.append(torch.load(file))
+                    pts.append(read_pts(file))
                 # pts = torch.load(pathtocheck)
                 data[name] = dict(zip(files,pts))
             setattr(self, 'data', data)
